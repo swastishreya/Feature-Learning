@@ -1,0 +1,2 @@
+# Feature-Learning
+We aim to illustrate the difference between feature extraction and feature learning. We see that when using classical machine learning models, there is a requirement to come up with features (input to the model) “explicitly”, that would give the best and suitable output for the task in hand. However, when using deep learning models, these features are derived “implicitly” by the model as the training progresses.
