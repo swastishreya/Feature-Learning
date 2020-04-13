@@ -1,0 +1,104 @@
+Original Model (M1):
+
+model = Sequential()
+model.add(Conv2D(28, kernel_size=(3,3), input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Flatten())
+model.add(Dense(128, activation=tf.nn.relu))
+model.add(Dropout(0.2))
+model.add(Dense(10,activation=tf.nn.softmax))
+
+Accuracy: [0.06238092326509313, 0.9847000241279602]
+Training time: 240s
+
+M2:
+"Without the pooling layer"
+
+model = Sequential()
+model.add(Conv2D(28, kernel_size=(3,3), input_shape=input_shape))
+model.add(Flatten())
+model.add(Dense(128, activation=tf.nn.relu))
+model.add(Dropout(0.2))
+model.add(Dense(10,activation=tf.nn.softmax))
+
+Accuracy: [0.0706479616504861, 0.9789999723434448]
+Training time: 580s
+
+M3:
+"Adding a layer of Conv and MaxPool"
+
+model = Sequential()
+model.add(Conv2D(28, kernel_size=(3,3), input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Conv2D(56, kernel_size=(3,3)))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Flatten())
+model.add(Dense(128, activation=tf.nn.relu))
+model.add(Dropout(0.2))
+model.add(Dense(10,activation=tf.nn.softmax))
+
+Accuracy: [0.036881979375459194, 0.9882000088691711]
+Training time: 150s
+
+M4:
+"Without dropout"
+
+model = Sequential()
+model.add(Conv2D(28, kernel_size=(3,3), input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Flatten())
+model.add(Dense(128, activation=tf.nn.relu))
+model.add(Dense(10,activation=tf.nn.softmax))
+
+Accuracy: [0.08011912217734705, 0.9839000105857849]
+Training time: 160s
+Note: Training accuracy reached 99.7%
+
+M5:
+"With dropout=0.4"
+
+model = Sequential()
+model.add(Conv2D(28, kernel_size=(3,3), input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Flatten())
+model.add(Dense(128, activation=tf.nn.relu))
+model.add(Dropout(0.4))
+model.add(Dense(10,activation=tf.nn.softmax))
+
+Accuracy: [0.0707711685587652, 0.9776999950408936]
+Training time: 160s
+
+M6:
+"Adding another fully connected layer"
+
+model = Sequential()
+model.add(Conv2D(28, kernel_size=(3,3), input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Flatten())
+model.add(Dense(128, activation=tf.nn.relu))
+model.add(Dropout(0.1))
+model.add(Dense(256, activation=tf.nn.relu))
+model.add(Dropout(0.2))
+model.add(Dense(10,activation=tf.nn.softmax))
+
+Accuracy: [0.08175029858719395, 0.9836999773979187]
+Training time: 170s
+Note: Training accuracy reached 99.5%
+
+M7:
+"With two Conv & MaxPool layer and two FC layers"
+
+model = Sequential()
+model.add(Conv2D(28, kernel_size=(3,3), input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Conv2D(56, kernel_size=(3,3)))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Flatten())
+model.add(Dense(128, activation=tf.nn.relu))
+model.add(Dropout(0.1))
+model.add(Dense(256, activation=tf.nn.relu))
+model.add(Dropout(0.2))
+model.add(Dense(10,activation=tf.nn.softmax))
+
+Accuracy: [0.04809242393644221, 0.9905999898910522]
+Training time: 160s
