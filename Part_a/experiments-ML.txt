@@ -1,0 +1,34 @@
+M1:
+
+lr = LogisticRegression(C=50. / 60000, penalty='l1', solver='saga', tol=0.1)
+Score: 0.914
+
+M2:
+
+r = Ridge(alpha=.5, tol=0.1, solver='saga')
+Score: 0.625
+
+M3:
+
+lr = Lasso(alpha=.1, tol=0.1)
+Score: 0.626
+
+M4:
+
+br = BayesianRidge(tol=0.1)
+Score: 0.626
+
+M5:
+
+lr = LogisticRegression(C=50. / 60000, penalty='elasticnet', solver='saga', tol=0.1, l1_ratio=0.5)
+Score: 0.915
+
+M6:
+
+lr = LogisticRegression(C=50. / 60000, penalty='elasticnet', solver='saga', tol=0.1, l1_ratio=0.5, multi_class='multinomial')
+Score: 0.923
+
+Notes: The “sag” solver uses Stochastic Average Gradient descent. It is faster than other solvers for large datasets, when both the number of samples and the number of features are large.
+
+The “saga” solver is a variant of “sag” that also supports the non-smooth penalty="l1". This is therefore the solver of choice for sparse multinomial logistic regression. It is also the only solver that supports penalty="elasticnet".
+
