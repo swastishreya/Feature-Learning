@@ -9,7 +9,7 @@ def AlexNet(input_images):
     conv = tf.nn.conv2d(input_images, kernel, [1, 4, 4, 1], padding = "SAME")
     bias = tf.Variable(tf.truncated_normal([96]), name = "conv1_bias")
     conv_with_bias = tf.nn.bias_add(conv, bias)
-    conv1 = tf.nn.relu(conv_with_bias, name="conv1")ls
+    conv1 = tf.nn.relu(conv_with_bias, name="conv1")
 
     lrn1 = tf.nn.lrn(conv1,
                     alpha=1e-4,
@@ -85,15 +85,12 @@ def AlexNet(input_images):
     fc2 = tf.matmul(fc1, weights) + bias
     fc2 = tf.nn.relu(fc2, name="fc2")
 
-    # FC3
-    weights = tf.Variable(tf.truncated_normal([fc_size, fc_size]), name="fc3_weights")
-    bias = tf.Variable(tf.truncated_normal([fc_size]), name="fc3_bias")
-    fc3 = tf.matmul(fc2, weights) + bias
-    fc3 = tf.nn.relu(fc3, name="fc3")
+    # since we are extracting features and not probabilities
+    return fc2
 
-    # Output Layer
-    weights = tf.Variable(tf.zeros([fc_size, n_classes]), name="output_weight")
-    bias = tf.Variable(tf.truncated_normal([n_classes]), name="output_bias")
-    out = tf.matmul(fc3, weights) + bias
+    # Output Layer /FC3
+    # weights = tf.Variable(tf.zeros([fc_size, n_classes]), name="output_weight")
+    # bias = tf.Variable(tf.truncated_normal([n_classes]), name="output_bias")
+    # out = tf.matmul(fc2, weights) + bias
 
-    probabilities = tf.nn.softmax(out)
+    # probabilities = tf.nn.softmax(out)
