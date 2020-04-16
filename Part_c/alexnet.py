@@ -66,7 +66,7 @@ def AlexNet(input_images):
     conv = tf.nn.conv2d(conv4, kernel, [1, 1, 1, 1], padding = "SAME")
     bias = tf.Variable(tf.truncated_normal([256]), name = "conv5_bias")
     conv_with_bias = tf.nn.bias_add(conv, bias)
-    conv2 = tf.nn.relu(conv_with_bias, name="conv5")
+    conv5 = tf.nn.relu(conv_with_bias, name="conv5")
 
 
     # Flatten
