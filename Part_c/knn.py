@@ -32,8 +32,10 @@ def getDescriptors(images, labels, model) :
     for image in images : 
         print (image.shape)
         # Re-sizing the image
+        image = Variable(torch.Tensor(image))
         image = cv2.resize(image, (224, 224), interpolation=cv2.INTER_AREA)
         feature = model(image)
+        print (len(feature))
         if des is not None : 
             features.append(feature)
             image_labels.append(labels[i])
@@ -71,9 +73,9 @@ x_train, x_test, y_train, y_test = train_test_split(features,
                                                     random_state=4)
 
 clf = cv2.ml.KNearest_create()
-clf.train(X_train, cv2.ml.ROW_SAMPLE, np.asarray(y_train, dtype=np.float32))
+clf.train(x_train, cv2.ml.ROW_SAMPLE, np.asarray(y_train, dtype=np.float32))
 
-ret, results, neighbours ,dist = clf.findNearest(X_test, k=10)
+ret, results, neighbours ,dist = clf.findNearest(x_test, k=10)
 
 pred_label = []
 for var in results:
@@ -85,3 +87,4 @@ print (pred_label)
     
 # Measuring the accuracies
 metrics.accuracy_score(y_test, pred_label)
+
