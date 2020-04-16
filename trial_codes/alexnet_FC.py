@@ -59,7 +59,7 @@ def train_model(model, criterion, optimizer, scheduler, epochs=25):
             running_loss = 0.0
             running_corrects = 0
 
-            for inouts, labels in dataloaders[phase]:
+            for inputs, labels in dataloaders[phase]:
                 inputs = inputs.to(device)
                 labels = labels.to(device) 
 
@@ -101,22 +101,45 @@ def train_model(model, criterion, optimizer, scheduler, epochs=25):
     model.load_state_dict(best_model_wt)
     return model
 
+
 alexnet = torchvision.models.alexnet(pretrained=True)
 for param in alexnet.parameters():
     param.requires_grad = False 
 
-# In AlexNet the model is sequentially defined, change the code below
+# In AlexNet the model is sequentially defined
 
-# num_features = alexnet.fc.in_features 
+classifier_list = list(alexnet.classifier)
 
-# alexnet.fc = nn.Linear(num_features, 2)
+num_features = classifier_list[-1].in_features
 
-# alexnet = alexnet.to(device)
+classifier_list[-1] = nn.Linear(num_features, 2)
 
-# criterion = nn.CrossEntropyLoss()
+alexnet.classifier = nn.Sequential(classifier_list[0],
+                                   classifier_list[1],
+                                   classifier_list[2],
+                                   classifier_list[3],
+                                   classifier_list[4],
+                                   classifier_list[5],
+                                   classifier_list[6],
+                                   nn.Softmax(1))
 
-# optimizer = optim.SGD(alexnet.fc.parameters(), lr=0.001, momentum=0.9)
+alexnet = alexnet.to(device)
 
-# exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+criterion = nn.CrossEntropyLoss()
 
-# train_model(alexnet, criterion, optimizer, exp_lr_scheduler, epochs=25)
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+print(count_parameters(alexnet))
+
+optimizer = optim.SGD(alexnet.classifier.parameters(), lr=0.001, momentum=0.9)
+
+exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+
+train_model(alexnet, criterion, optimizer, exp_lr_scheduler, epochs=25)
+
+# Experiment 1:
+
+# Training complete in 0m 45s
+# Best val Acc: 0.921569
+
