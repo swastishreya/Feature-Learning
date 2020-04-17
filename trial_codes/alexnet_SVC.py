@@ -1,110 +1,116 @@
+import os
+import numpy as np
+from PIL import Image
 import torch
-import torch.nn as nn 
-import torch.nn.functional as F
-import torch.optim as optim 
-from torch.optim import lr_scheduler 
+import torch.nn as nn
+from torch.autograd import Variable
 
-import numpy as np 
-import time 
-import os 
 import copy
-import matplotlib.pyplot as plt 
 
-import torchvision 
+import torchvision
 from torchvision import datasets, models, transforms
 
+from sklearn.decomposition import PCA
+from sklearn import svm
+from sklearn.model_selection import StratifiedKFold  
+
 data_transforms = {
-    'train': transforms.Compose([
-        transforms.RandomResizedCrop(224),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ]),
-    'val': transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ])
+   'train': transforms.Compose([
+       transforms.ToPILImage(),
+       transforms.RandomResizedCrop(224),
+       transforms.RandomHorizontalFlip(),
+       transforms.ToTensor(),
+       transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+   ]),
+   'val': transforms.Compose([
+       transforms.ToPILImage(),
+       transforms.Resize(256),
+       transforms.CenterCrop(224),
+       transforms.ToTensor(),
+       transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+   ])
 }
 
-data_dir = 'data/hymenoptera_data'
-image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
-                                          data_transforms[x])
-                  for x in ['train', 'val']}
-dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
-                                             shuffle=True, num_workers=4)
-              for x in ['train', 'val']}
-dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
-class_names = image_datasets['train'].classes
+def read_images(path, folders):
+    images = []
+    labels = []
+    idx = 0
+    for folder in folders:
+        for filename in os.listdir(path+folder):
+            image = os.path.join(path+folder, filename)
+            if image is not None:
+                images.append(image)
+                labels.append(idx)
+                
+        idx += 1
+    images = np.array(images)
+    labels = np.array(labels)
+    return images, labels
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-def train_model(model, epochs=25):
-    since = time.time()
+train_data_dir = 'data/hymenoptera_data/train/'
+val_data_dir = 'data/hymenoptera_data/val/'
 
-    for epoch in range(epochs):
-        print('Epoch {}/{}'.format(epoch, epochs - 1))
-        print('-' * 10)
+def getDescriptors(images, labels, model, phase) :
+    features = []
+    image_labels = []
+    i = 0
 
-        for phase in ['train', 'val']:
+    for image in images:
+
+        img = Image.open(image)
+
+        try:
             if phase == 'train':
-                model.train()
+                trans2 = transforms.RandomResizedCrop(224)
+                trans3 = transforms.RandomHorizontalFlip()
+                trans4 = transforms.ToTensor()
+                trans5 = transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+                img = trans5(trans4(trans3(trans2(img))))
             else:
-                model.eval()
+                trans2 = transforms.Resize(256)
+                trans3 = transforms.CenterCrop(224)
+                trans4 = transforms.ToTensor()
+                trans5 = transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+                img = trans5(trans4(trans3(trans2(img))))
 
-            running_loss = 0.0
-            running_corrects = 0
+            img = img.unsqueeze(0)
+            feature = model(img)
+            feature = feature.data.numpy().reshape(1000)
+            if feature is not None :
+                features.append(feature)
+                image_labels.append(labels[i])
+            i += 1
+        except:
+            continue
 
-            for inputs, labels in dataloaders[phase]:
-                inputs = inputs.to(device)
-                labels = labels.to(device) 
+    return features, image_labels
 
-                optimizer.zero_grad()
-
-                with torch.set_grad_enabled(phase == 'train'):
-                    outputs = model(inputs)
-                    _, preds = torch.max(outputs, 1)
-                    loss = criterion(outputs, labels)
-
-                    if phase == 'train': 
-                        loss.backward()
-                        optimizer.step()
-
-                running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
-
-            if phase == 'train':
-                scheduler.step()
-
-            epoch_loss = running_loss / dataset_sizes[phase] 
-            epoch_acc = running_corrects.double() / dataset_sizes[phase]
-
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(
-                phase, epoch_loss, epoch_acc))
-
-            if phase == 'val' and epoch_acc > best_acc:
-                best_acc = epoch_acc 
-                best_model_wt = copy.deepcopy(model.state_dict())
-
-        print()
-
-    time_elapsed = time.time() - since
-    print('Training complete in {:.0f}m {:.0f}s'.format(
-        time_elapsed // 60, time_elapsed % 60))
-    print('Best val Acc: {:4f}'.format(best_acc))
-
-    # load best model weights
-    model.load_state_dict(best_model_wt)
-    return model
+train_images, train_labels = read_images(train_data_dir, ['ants', 'bees'])
+val_images, val_labels = read_images(val_data_dir, ['ants', 'bees'])
 
 
 alexnet = torchvision.models.alexnet(pretrained=True)
+alexnet.eval()
 
-train_model(alexnet, epochs=25)
+train_features, train_labels = getDescriptors(train_images, train_labels, alexnet, 'train')
+val_features, val_labels = getDescriptors(val_images, val_labels, alexnet, 'val')
 
-# Experiment 1:
+pca = PCA(n_components = 210)
+train_features = pca.fit_transform(train_features)
+val_features = pca.transform(val_features)
 
-# Training complete in 0m 45s
-# Best val Acc: 0.921569
+svc = svm.SVC(kernel='linear')
+svc.fit(train_features, train_labels)
+score = svc.score(val_features, val_labels)
+print("Score: {}".format(score))
 
+# Features Score
+
+# Without PCA : Score: 0.8758169934640523
+# PCA n_components = 244 : Score: 0.8627450980392157
+# PCA n_components = 220 : Score: 0.9019607843137255
+# PCA n_components = 210 : Score: 0.8823529411764706
+# PCA n_components = 200 : Score: 0.9019607843137255
+# PCA n_components = 180 :Score: 0.8954248366013072
+# PCA n_components = 100 : Score: 0.8954248366013072
