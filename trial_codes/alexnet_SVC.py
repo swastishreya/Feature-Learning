@@ -48,8 +48,8 @@ def read_images(path, folders):
     return images, labels
 
 
-train_data_dir = 'data/hymenoptera_data/train/'
-val_data_dir = 'data/hymenoptera_data/val/'
+train_data_dir = '/home/swasti/Documents/sem6/VR/Assignment3/Feature-Learning/trial_codes/101_ObjectCategories/101_ObjectCategories/train/'
+val_data_dir = '/home/swasti/Documents/sem6/VR/Assignment3/Feature-Learning/trial_codes/101_ObjectCategories/101_ObjectCategories/val/'
 
 def getDescriptors(images, labels, model, phase) :
     features = []
@@ -76,7 +76,7 @@ def getDescriptors(images, labels, model, phase) :
 
             img = img.unsqueeze(0)
             feature = model(img)
-            feature = feature.data.numpy().reshape(1000)
+            feature = feature.data.numpy().reshape(4096)
             if feature is not None :
                 features.append(feature)
                 image_labels.append(labels[i])
@@ -86,17 +86,29 @@ def getDescriptors(images, labels, model, phase) :
 
     return features, image_labels
 
-train_images, train_labels = read_images(train_data_dir, ['ants', 'bees'])
-val_images, val_labels = read_images(val_data_dir, ['ants', 'bees'])
+folders = [ item for item in os.listdir(train_data_dir) if os.path.isdir(os.path.join(train_data_dir, item)) ]
+
+train_images, train_labels = read_images(train_data_dir, folders)
+val_images, val_labels = read_images(val_data_dir, folders)
 
 
 alexnet = torchvision.models.alexnet(pretrained=True)
+classifier_list = list(alexnet.classifier)
+
+alexnet.classifier = nn.Sequential(classifier_list[0],
+                                   classifier_list[1],
+                                   classifier_list[2],
+                                   classifier_list[3],
+                                   classifier_list[4],
+                                   classifier_list[5])
+
+
 alexnet.eval()
 
 train_features, train_labels = getDescriptors(train_images, train_labels, alexnet, 'train')
 val_features, val_labels = getDescriptors(val_images, val_labels, alexnet, 'val')
 
-pca = PCA(n_components = 210)
+pca = PCA(n_components = 500)
 train_features = pca.fit_transform(train_features)
 val_features = pca.transform(val_features)
 
@@ -105,7 +117,7 @@ svc.fit(train_features, train_labels)
 score = svc.score(val_features, val_labels)
 print("Score: {}".format(score))
 
-# Features Score
+# Features Score for Ants and Bees
 
 # Without PCA : Score: 0.8758169934640523
 # PCA n_components = 244 : Score: 0.8627450980392157
@@ -114,3 +126,13 @@ print("Score: {}".format(score))
 # PCA n_components = 200 : Score: 0.9019607843137255
 # PCA n_components = 180 :Score: 0.8954248366013072
 # PCA n_components = 100 : Score: 0.8954248366013072
+
+
+# Features Score for 101_ObjectCategories
+# PCA n_components = 210 : Score: 0.46727748691099474
+# Without PCA : Score: 0.49476439790575916
+# PCA n_components = 300 : Score: 0.4725130890052356
+# Without last two layer n PCA : Score: 0.4620418848167539
+# Without last layer n PCA : Score: 0.5039267015706806
+# Without last layer n PCA n_components = 300 : Score: 0.4620418848167539
+# Without last layer n PCA n_components = 500 : Score: 0.5013089005235603

@@ -28,7 +28,7 @@ data_transforms = {
     ])
 }
 
-data_dir = 'data/hymenoptera_data'
+data_dir = '/home/swasti/Documents/sem6/VR/Assignment3/Feature-Learning/trial_codes/101_ObjectCategories/101_ObjectCategories'
 image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                           data_transforms[x])
                   for x in ['train', 'val']}
@@ -103,8 +103,8 @@ def train_model(model, criterion, optimizer, scheduler, epochs=25):
 
 
 alexnet = torchvision.models.alexnet(pretrained=True)
-for param in alexnet.parameters():
-    param.requires_grad = False 
+# for param in alexnet.parameters():
+#     param.requires_grad = False 
 
 # In AlexNet the model is sequentially defined
 
@@ -112,7 +112,7 @@ classifier_list = list(alexnet.classifier)
 
 num_features = classifier_list[-1].in_features
 
-classifier_list[-1] = nn.Linear(num_features, 2)
+classifier_list[-1] = nn.Linear(num_features, 101)
 
 alexnet.classifier = nn.Sequential(classifier_list[0],
                                    classifier_list[1],
@@ -132,14 +132,22 @@ def count_parameters(model):
 
 print(count_parameters(alexnet))
 
-optimizer = optim.SGD(alexnet.classifier.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.SGD(alexnet.parameters(), lr=0.001, momentum=0.9)
 
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
 train_model(alexnet, criterion, optimizer, exp_lr_scheduler, epochs=25)
 
-# Experiment 1:
+# Experiment 1 on Ants and Bees:
 
 # Training complete in 0m 45s
 # Best val Acc: 0.921569
+
+# Experiment 1 on 101_ObjectCategories:
+# Training complete in 7m 29s
+# Best val Acc: 0.479401
+
+# Fine tuning
+# Training complete in 38m 57s
+# Best val Acc: 0.411985
 
