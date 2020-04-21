@@ -1,0 +1,14 @@
+KNN:
+
+# With last layer and PCA = 0.9 : 0.6575829383886256
+# With last layer and PCA = 0.8 : 0.6137440758293838
+# With last layer and without PCA : 0.6528436018957346
+# Without last two layers and without PCA : 0.6907582938388626 
+# Without last two layers and and PCA = 0.8 : 0.6374407582938388
+# Without last two layers and and PCA = 0.9 : 0.6883886255924171
+
+SVC: 
+
+# With last layer and PCA = 0.9 Score: 0.7115771507976371
+# Without last two layers and without PCA : [0.77835951 0.76215583 0.78271166 0.76660682 0.78363636]
+# Score: 0.7746940379776563
