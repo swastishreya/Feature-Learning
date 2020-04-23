@@ -1,0 +1,75 @@
+Model: Awesome CNN
+
+CNN(
+  (conv_layer): Sequential(
+    (0): Conv2d(3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+    (2): Sigmoid()
+    (3): Conv2d(32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (4): Sigmoid()
+    (5): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+    (6): Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (7): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+    (8): Sigmoid()
+    (9): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (10): Sigmoid()
+    (11): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+    (12): Dropout2d(p=0.05, inplace=False)
+    (13): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (14): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+    (15): Sigmoid()
+    (16): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (17): Sigmoid()
+    (18): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  )
+  (fc_layer): Sequential(
+    (0): Dropout(p=0.1, inplace=False)
+    (1): Linear(in_features=4096, out_features=1024, bias=True)
+    (2): Sigmoid()
+    (3): Linear(in_features=1024, out_features=512, bias=True)
+    (4): Sigmoid()
+    (5): Dropout(p=0.1, inplace=False)
+    (6): Linear(in_features=512, out_features=10, bias=True)
+  )
+)
+
+activation_fn = nn.Sigmoid 
+zero_padding = 1 
+batch_norm = False 
+dropout_2d = 0.05 
+dropout = 0.1 
+m = 0.9 
+
+optimizer = optim.SGD(net.parameters(), lr=0.001, momentum = m)
+
+[1,  2000] loss: 2.361
+[1,  4000] loss: 2.327
+[1,  6000] loss: 2.315
+[1,  8000] loss: 2.310
+[1, 10000] loss: 2.307
+[1, 12000] loss: 2.307
+[2,  2000] loss: 2.305
+[2,  4000] loss: 2.305
+[2,  6000] loss: 2.305
+[2,  8000] loss: 2.304
+[2, 10000] loss: 2.305
+[2, 12000] loss: 2.304
+[3,  2000] loss: 2.304
+[3,  4000] loss: 2.303
+[3,  6000] loss: 2.304
+[3,  8000] loss: 2.304
+[3, 10000] loss: 2.304
+[3, 12000] loss: 2.304
+[4,  2000] loss: 2.303
+[4,  4000] loss: 2.304
+[4,  6000] loss: 2.304
+[4,  8000] loss: 2.304
+[4, 10000] loss: 2.303
+[4, 12000] loss: 2.304
+[5,  2000] loss: 2.304
+[5,  4000] loss: 2.303
+[5,  6000] loss: 2.303
+[5,  8000] loss: 2.304
+[5, 10000] loss: 2.304
+
+Accuracy of the network on the 10000 test images: 10 %
