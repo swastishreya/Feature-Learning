@@ -371,3 +371,30 @@ Accuracy of truck : 22 %
 ---------------------------------------------------------------------------
 
 CNN Adam without batch norm
+
+[1,  2000] loss: 2.321
+[1,  4000] loss: 2.315
+[1,  6000] loss: 2.315
+[1,  8000] loss: 2.311
+[1, 10000] loss: 2.152
+[1, 12000] loss: 2.016
+[2,  2000] loss: 1.969
+[2,  4000] loss: 1.962
+[2,  6000] loss: 1.939
+[2,  8000] loss: 1.917
+[2, 10000] loss: 1.904
+[2, 12000] loss: 1.878
+Training complete in 2m 19s
+
+Accuracy of the network on the 10000 test images: 32 %
+
+Accuracy of plane : 38 %
+Accuracy of   car : 37 %
+Accuracy of  bird : 21 %
+Accuracy of   cat :  2 %
+Accuracy of  deer :  0 %
+Accuracy of   dog : 34 %
+Accuracy of  frog : 66 %
+Accuracy of horse : 36 %
+Accuracy of  ship : 40 %
+Accuracy of truck : 43 %
